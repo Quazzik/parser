@@ -15,5 +15,6 @@ namespace parser.Models.Entities
         public int ShopID { get; set; }
         [ForeignKey (nameof(ShopID))]
         public Shop Shop { get; set; }
+        public string Url { get; set; }
     }
 }
