@@ -1,18 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using parser.Models.Entities;
+using System.Security.Cryptography.Xml;
 using System.Text.RegularExpressions;
 
 namespace parser.Services.Parsers
 {
-    public partial class CersanitParserService : IParserService
+    public partial class NeptunParserService : IParserService
     {
         private Regex regex = CersanitRegex();
         private readonly DBService _context;
         private readonly HTTPService _http;
-        public CersanitParserService(DBService context)
+
+        public NeptunParserService(DBService context, HTTPService http)
         {
             _context = context;
+            _http = http;
         }
+
         public async Task<uint> GetPriceAsync(string url)
         {
             string html = await _http.GetHTMLAsync(url);
@@ -21,15 +25,15 @@ namespace parser.Services.Parsers
 
         public async Task<List<Product>> GetProductAsync()
         {
-            return await _context.Products.Where(x => x.Shop.ID == 1).ToListAsync();
+            return await _context.Products.Where(x => x.Shop.ID == 2).Include(x=>x.Shop).Include(x=> x.Category).ToListAsync();
         }
 
         public async Task<bool> UpdatePrices()
         {
             try
             {
-                var cersanitProducts = await _context.Products.Where(x => x.Shop.ID == 1).ToListAsync();
-                foreach (var product in cersanitProducts)
+                var neptunProducts = await _context.Products.Where(x => x.Shop.ID == 2).ToListAsync();
+                foreach (var product in neptunProducts)
                 {
                     var newPrice = await GetPriceAsync(product.Url);
                     product.Price = newPrice;
@@ -43,12 +47,14 @@ namespace parser.Services.Parsers
                 return false;
             }
         }
+
         private uint Parse(string url)
         {
-            var price = regex.Match(url).Groups[1].Value;
+            var price = regex.Match(url).Groups[1].Value.Replace(" ", "");
             return uint.TryParse(price, out var priceinteger) ? priceinteger : 0;
         }
-        [GeneratedRegex(@"")]
+
+        [GeneratedRegex(@"<div class=""[a-zA-Z\-]*product-price[a-zA-Z\-]*"">\s*(\d*\s*\d*\s*\d+)")]
         private static partial Regex CersanitRegex();
     }
 }

@@ -3,7 +3,7 @@ using parser.Models.Entities;
 using parser.Services.Parsers;
 using System.Text.RegularExpressions;
 
-namespace parser.Services
+namespace parser.Services.Parsers
 {
     public partial class FixenParserService : IParserService
     {
@@ -11,9 +11,10 @@ namespace parser.Services
         private readonly DBService _context;
         private readonly HTTPService _http;
 
-        public FixenParserService(DBService context)
+        public FixenParserService(DBService context, HTTPService http)
         {
             _context = context;
+            _http = http;
         }
 
         public async Task<bool> UpdatePrices()
