@@ -1,0 +1,112 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using ParserMVC.DataModels
+@using parser.Models.Entities
+@model PageData
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пример страницы</title>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .left-side {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .right-side {
+            flex: 1;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-side">
+            <h2>Таблица</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Название товара</th>
+                        <th>Цена товара</th>
+                        <th>Категория товара</th>
+                        <th>Магазин</th>
+                        <th>ССылка на товар</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.RowData)
+                    {
+                        <tr>
+                            <td>@product.RowProduct.Name</td>
+                            <td>@product.RowProduct.Price</td>
+                            <td>@product.CategoryName</td>
+                            <td>@product.ShopName</td>
+                            <td>@product.RowProduct.Url</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <form method="post" action="/Home/UpdatePrices">
+                <br/><button type="submit">UpdatePrices</button>
+            </form>
+        </div>
+        <div class="right-side">
+            <h2>Добавление товара</h2>
+            <form action="/Home/AddProduct" method="post">
+                <div>
+                    <label for="name">Название товара:</label><br/>
+                    <input type="text" id="name" name="name">
+                </div>
+                <div>
+                    <label for="shop">Магазин:</label><br/>
+                    <select id="shop" name="shop">
+                        @foreach (var shop in Model.Shops)
+                        {
+                            <option value="@shop.ID">@shop.ShopName</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="category">Категория товара:</label><br/>
+                    <select id="category" name="category">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.ID">@category.Name</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="url">Ссылка на товар:</label><br/>
+                    <input type="text" id="url" name="url">
+                </div>
+                <div>
+                    <br/><button type="submit">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
