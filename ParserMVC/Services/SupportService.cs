@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using parser.Models.Entities;
 using parser.Services;
 using ParserMVC.DataModels;
@@ -47,7 +46,6 @@ namespace UI.Server.Services
             }
         )
         .ToList();
-
             return (transferDataModels);
         }
     }

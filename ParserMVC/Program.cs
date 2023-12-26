@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using parser.Services;
 using parser.Services.Parsers;
+using ParserMVC.Services;
 using UI.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,9 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
 builder.Services.AddDbContext<MyApplicationContext>(o => o.UseSqlite(connectionString));
 
+builder.Services.AddTransient<ParserLoggerService>();
 builder.Services.AddTransient<HTTPService>();
+
 builder.Services.AddTransient<FixenParserService>();
 builder.Services.AddTransient<NeptunParserService>();
 builder.Services.AddTransient<SupportService>();

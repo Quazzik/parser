@@ -14,6 +14,8 @@
     <style>
         .container {
             display: flex;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         .left-side {
@@ -40,12 +42,21 @@
         th {
             background-color: #f2f2f2;
         }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Нечетные строки */
+        tr:nth-child(odd) {
+            background-color: #d3d3d3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="left-side">
-            <h2>Таблица</h2>
+            <h2>Товары</h2>
             <table>
                 <thead>
                     <tr>
@@ -53,7 +64,7 @@
                         <th>Цена товара</th>
                         <th>Категория товара</th>
                         <th>Магазин</th>
-                        <th>ССылка на товар</th>
+                        <th>Ссылка на товар</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,13 +75,13 @@
                             <td>@product.RowProduct.Price</td>
                             <td>@product.CategoryName</td>
                             <td>@product.ShopName</td>
-                            <td>@product.RowProduct.Url</td>
+                            <td><a href="">@product.RowProduct.Url</a></td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <form method="post" action="/Home/UpdatePrices">
-                <br/><button type="submit">UpdatePrices</button>
+            <form method="post" action="/Home/Index">
+                <br /><button type="submit" class="btn btn-primary">Обновить цены</button>
             </form>
         </div>
         <div class="right-side">
@@ -103,7 +114,7 @@
                     <input type="text" id="url" name="url">
                 </div>
                 <div>
-                    <br/><button type="submit">Добавить</button>
+                    <br /><button type="submit" class="btn btn-primary">Добавить</button>
                 </div>
             </form>
         </div>

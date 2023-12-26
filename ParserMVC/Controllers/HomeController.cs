@@ -5,19 +5,26 @@ using parser.Services;
 using parser.Services.Parsers;
 using ParserMVC.DataModels;
 using ParserMVC.Models;
+using ParserMVC.Services;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UI.Server.Services;
 
 namespace ParserMVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly FixenParserService _fixenService;
         private readonly NeptunParserService _netpunService;
         private readonly MyApplicationContext _context;
         private readonly SupportService _supportService;
-        public HomeController(FixenParserService fixenService, NeptunParserService neptunService, ILogger<HomeController> logger, MyApplicationContext context, SupportService supportService)
+        private readonly ParserLoggerService _logger;
+        public HomeController(
+            FixenParserService fixenService,
+            NeptunParserService neptunService,
+            MyApplicationContext context,
+            SupportService supportService,
+            ParserLoggerService logger)
         {
             _logger = logger;
             _fixenService = fixenService;
@@ -28,6 +35,7 @@ namespace ParserMVC.Controllers
         [HttpGet]
         public async Task<JsonResult> UpdateFixenPricesit()
         {
+            await MakeLog("Обновлены цены Fixen");
             return Json(await _fixenService.UpdatePrices());
         }
         [HttpGet]
@@ -38,6 +46,7 @@ namespace ParserMVC.Controllers
         [HttpGet]
         public async Task<JsonResult> UpdateNeptunPricesit()
         {
+            await MakeLog("Обновлены цены Neptun");
             return Json(await _netpunService.UpdatePrices());
         }
         [HttpGet]
@@ -56,11 +65,16 @@ namespace ParserMVC.Controllers
                 Categories = await _supportService.GetCategoriesAsync(),
                 Shops = await _supportService.GetShopsAsync()
             };
+            await MakeLog("Открыт сайт");
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult AddProduct([FromForm] string name, [FromForm] string shop, [FromForm] string category, [FromForm] string url)
+        public async Task<IActionResult> AddProduct(
+            [FromForm] string name,
+            [FromForm] string shop,
+            [FromForm] string category,
+            [FromForm] string url)
         {
             if (int.TryParse(shop, out int shopId) && int.TryParse(category, out int categoryId))
             {
@@ -73,20 +87,28 @@ namespace ParserMVC.Controllers
                 };
                 _context.Add(newProduct);
                 _context.SaveChanges();
+                await MakeLog($"Добавлен товар {name}");
                 return RedirectToAction("Index");
             }
             else
             {
                 TempData["ErrorMessage"] = "Ошибка при получении ID магазина или категории.";
+                await MakeLog($"Ошибка добавления товара, name = {name}, shop = {shop}, category = {category}, url = {url}");
                 return RedirectToAction("Index");
             }
         }
 
-            public async Task<IActionResult> UpdatePrices()
+        public async Task<IActionResult> UpdatePrices()
         {
             var success = await _fixenService.UpdatePrices();
-            if (success) success = await _netpunService.UpdatePrices();
+            if (success) await _netpunService.UpdatePrices();
+                await MakeLog("Обновлены цены всех товаров");
                 return Ok();
+        }
+
+        public async Task MakeLog(string message)
+        {
+            await _logger.Log(message);
         }
 
         public IActionResult Privacy()
