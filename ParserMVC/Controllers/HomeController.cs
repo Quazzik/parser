@@ -65,7 +65,7 @@ namespace ParserMVC.Controllers
                 Categories = await _supportService.GetCategoriesAsync(),
                 Shops = await _supportService.GetShopsAsync()
             };
-            await MakeLog("Открыт сайт");
+            await MakeLog("Открыта страница сайта");
             return View(model);
         }
 
@@ -102,8 +102,12 @@ namespace ParserMVC.Controllers
         {
             var success = await _fixenService.UpdatePrices();
             if (success) await _netpunService.UpdatePrices();
-                await MakeLog("Обновлены цены всех товаров");
-                return Ok();
+            var products = _context.Products;
+            foreach (var product in products)
+            {
+                await MakeLog($"Проверена цена товара {product.Name}, текущая цена - {product.Price}");
+            }
+            return Ok();
         }
 
         public async Task MakeLog(string message)
